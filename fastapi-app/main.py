@@ -1,7 +1,11 @@
 from fastapi import FastAPI
 import uvicorn
+from app import router as api_router
+from core.config import settings
+
 
 app = FastAPI()
+app.include_router(api_router, prefix=settings.api.prefix)
 
 
 @app.get("/")
