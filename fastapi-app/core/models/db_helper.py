@@ -45,4 +45,9 @@ class DataBaseHelper:
             yield session
 
 
-dp_helper = DataBaseHelper(url=str(settings.db.url))
+dp_helper = DataBaseHelper(
+    url=str(settings.db.url),
+    echo=settings.db.echo,
+    max_overflow=settings.db.max_overflow,
+    pool_size=settings.db.poolsize,
+)
