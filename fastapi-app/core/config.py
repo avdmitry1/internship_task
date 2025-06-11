@@ -1,5 +1,8 @@
+from dotenv import load_dotenv
 from pydantic import BaseModel, PostgresDsn
-from pydantic_settings import BaseSettings
+from pydantic_settings import BaseSettings, SettingsConfigDict
+
+load_dotenv()
 
 
 class RunConfig(BaseModel):
@@ -15,10 +18,16 @@ class DataBaseConfig(BaseModel):
     url: PostgresDsn
     echo: bool = False
     max_overflow: int = 10
-    poolsize: int = 5
+    pool_size: int = 5
 
 
 class Settings(BaseSettings):
+    model_config = SettingsConfigDict(
+        env_file=".env",
+        case_sensitive=False,
+        env_nested_delimiter="__",
+        env_prefix="FASTAPI_APP__",
+    )
     run: RunConfig = RunConfig()
     api: ApiPrefix = ApiPrefix()
     db: DataBaseConfig
