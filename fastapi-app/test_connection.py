@@ -1,15 +1,13 @@
 import asyncio
 
-from dotenv import load_dotenv
 from core.config import settings
 from asyncpg import connect
-
-load_dotenv()
 
 
 async def test_connection():
     try:
-        conn = await connect(str(settings.db.url))
+        dsn = str(settings.db.url).replace("postgresql+asyncpg://", "postgresql://")
+        conn = await connect(dsn)
         print("Connection successful to database!")
         await conn.close()
     except Exception as e:
