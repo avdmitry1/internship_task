@@ -56,3 +56,11 @@ class ItemCreate(ItemBase):
 
 class ItemRead(ItemBase):
     id: int
+
+
+class ItemUpdate(ItemBase):
+    pass
+
+
+class ItemDelete(BaseModel):
+    id: int

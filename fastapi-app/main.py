@@ -19,6 +19,7 @@ main_app = FastAPI(lifespan=lifespan)
 main_app.include_router(items_router, prefix=settings.api.prefix)
 
 
+# curl "http://127.0.0.1:8000/"
 @main_app.get("/")
 def home():
     return {"msg": "Keep pushing :)"}

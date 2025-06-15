@@ -4,13 +4,16 @@ from logging.config import fileConfig
 from sqlalchemy import pool
 from sqlalchemy.engine import Connection
 from sqlalchemy.ext.asyncio import async_engine_from_config
-from core.models.base import Base
 from core.config import settings
+from core.models.model_base import Base
+from core.models.model_item import Item  # noqa
 from alembic import context
 
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.
 config = context.config
+
+config.set_main_option("sqlalchemy.url", str(settings.db.url))
 
 # Interpret the config file for Python logging.
 # This line sets up loggers basically.
@@ -27,7 +30,6 @@ target_metadata = Base.metadata
 # can be acquired:
 # my_important_option = config.get_main_option("my_important_option")
 # ... etc.
-config.set_main_option("sqlalchemy.url", str(settings.db.url))
 
 
 def run_migrations_offline() -> None:
