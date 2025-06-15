@@ -1,23 +1,23 @@
 from typing import Annotated
 from pydantic import BaseModel, Field
 
-ItemName = Annotated[
+PodcastEpisodeName = Annotated[
     str,
     Field(
         min_length=3,
         max_length=50,
-        title="Item Name",
+        title="Podcast Episode Name",
         description="Name of the item, between 3 and 50 characters",
     ),
 ]
 
-ItemDescription = Annotated[
+PodcastEpisodeDescription = Annotated[
     str,
     Field(
         min_length=5,
         max_length=50,
         title="Description",
-        description="Original description of the item",
+        description="Original description of the podcast episode",
     ),
 ]
 
@@ -32,35 +32,35 @@ GPTDescription = Annotated[
 ]
 
 
-class ItemBase(BaseModel):
-    item: ItemName
-    description: ItemDescription
-    remaked_description: GPTDescription
+class PodcastEpisode(BaseModel):
+    title: PodcastEpisodeName
+    description: PodcastEpisodeDescription
+    host: GPTDescription
 
     model_config = {
         "json_schema_extra": {
             "examples": [
                 {
-                    "item": "Sample Item",
-                    "description": "Original description",
-                    "remaked_description": "Enhanced by GPT-4",
+                    "title": "The Future of AI",
+                    "description": "We discuss upcoming trends in artificial intelligence.",
+                    "host": "Joe Rogan",
                 }
             ]
         }
     }
 
 
-class ItemCreate(ItemBase):
+class PodcastEpisodeCreate(PodcastEpisode):
     pass
 
 
-class ItemRead(ItemBase):
+class PodcastEpisodeRead(PodcastEpisode):
     id: int
 
 
-class ItemUpdate(ItemBase):
+class PodcastEpisodeUpdate(PodcastEpisode):
     pass
 
 
-class ItemDelete(BaseModel):
+class PodcastEpisodeDelete(BaseModel):
     id: int

@@ -1,10 +1,10 @@
 from contextlib import asynccontextmanager
 from fastapi import FastAPI
 import uvicorn
-from app.api.items import router as items_router
+from app.api.api_endpoints import router as podcasts_router
 from core.config import settings
 from core.models.db_helper import db_helper
-from core.models.item import Item
+from core.models.model_podcast import Podcast
 
 
 @asynccontextmanager
@@ -16,7 +16,7 @@ async def lifespan(app: FastAPI):
 
 
 main_app = FastAPI(lifespan=lifespan)
-main_app.include_router(items_router, prefix=settings.api.prefix)
+main_app.include_router(podcasts_router, prefix=settings.api.prefix)
 
 
 # curl "http://127.0.0.1:8000/"
@@ -26,7 +26,7 @@ def home():
 
 
 if __name__ == "__main__":
-    print(Item.__tablename__)
+    print(Podcast.__tablename__)
     uvicorn.run(
         "main:main_app",
         host=settings.run.host,

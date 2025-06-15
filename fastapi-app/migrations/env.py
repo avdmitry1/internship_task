@@ -6,7 +6,7 @@ from sqlalchemy.engine import Connection
 from sqlalchemy.ext.asyncio import async_engine_from_config
 from core.config import settings
 from core.models.model_base import Base
-from core.models.model_item import Item  # noqa
+from core.models.model_podcast import Podcast  # noqa
 from alembic import context
 
 # this is the Alembic Config object, which provides

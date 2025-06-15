@@ -14,14 +14,14 @@ class DataBaseHelper:
         max_overflow: int = 10,
         pool_size: int = 5,
     ):
-        # Створюємо асинхронний движок бази даних з налаштуваннями пулу з'єднань
+        # Create the database engine
         self.engine = create_async_engine(
             url=url,
             echo=echo,
             max_overflow=max_overflow,
             pool_size=pool_size,
         )
-        # Створюємо фабрику сесій для роботи з базою даних
+        # Create the session factory
         self.session_factory = async_sessionmaker(
             bind=self.engine,  # Прив'язуємо до нашого движка
             autoflush=False,
@@ -29,6 +29,7 @@ class DataBaseHelper:
             expire_on_commit=False,
         )
 
+    # Method to close the engine
     async def dispose(self):
         """
         Закриває всі з'єднання з базою даних та звільняє ресурси.
@@ -37,6 +38,7 @@ class DataBaseHelper:
         """
         await self.engine.dispose()
 
+    # Method to get a session
     async def get_session(self):
         """
         Повертає сесію для роботи з базою даних.
