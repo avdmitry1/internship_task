@@ -1,12 +1,11 @@
 import asyncio
-from typing import Optional, List
 from fastapi import HTTPException
 from langchain_ollama import OllamaLLM
 from langchain.prompts import PromptTemplate
 from langchain.schema.output_parser import StrOutputParser
 
 from core.config import settings
-from core.schemas.llm import GenAltRequest, GenAltResponse
+from core.schemas.llm import GenAltRequest
 
 
 class LLMService:
@@ -102,5 +101,6 @@ class LLMService:
             return "OK" in result or "ok" in result.lower()
         except Exception:
             return False
+
 
 llm_services = LLMService()
