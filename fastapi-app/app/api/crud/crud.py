@@ -2,8 +2,8 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from core.models.model_podcast import Podcast
 from sqlalchemy import select
 from core.schemas.podcast import (
-    PodcastEpisodeCreate,
-    PodcastEpisodeUpdate,
+    PodcastCreate,
+    PodcastUpdate,
 )
 
 
@@ -23,7 +23,7 @@ async def get_podcast(
 
 
 async def create_podcast_db(
-    podcast: PodcastEpisodeCreate,
+    podcast: PodcastCreate,
     session: AsyncSession,
 ):
     db_podcast = Podcast(**podcast.model_dump())
@@ -35,7 +35,7 @@ async def create_podcast_db(
 
 async def update_podcast_db(
     podcast_id: int,
-    podcast: PodcastEpisodeUpdate,
+    podcast: PodcastUpdate,
     session: AsyncSession,
 ):
     db_podcast = await get_podcast(podcast_id, session)

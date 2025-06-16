@@ -1,5 +1,6 @@
+from typing import List
 from fastapi import APIRouter, Depends, HTTPException, Path, Response, status
-from api.crud.crud import (
+from app.api.crud.crud import (
     create_podcast_db,
     delete_podcast_db,
     get_all_podcasts_db,
@@ -7,65 +8,69 @@ from api.crud.crud import (
     update_podcast_db,
 )
 from core.schemas.podcast import (
-    PodcastEpisodeRead,
-    PodcastEpisodeCreate,
-    PodcastEpisodeUpdate,
+    PodcastRead,
+    PodcastCreate,
+    PodcastUpdate,
 )
 from sqlalchemy.ext.asyncio import AsyncSession
 from core.models.db_helper import db_helper
 
-router = APIRouter(prefix="/episodes", tags=["Episodes"])
+router = APIRouter(prefix="/podcasts", tags=["Podcasts"])
 
 
-# curl -X 'GET' 'localhost:8000/api/episodes/'
-@router.get("/", response_model=list[PodcastEpisodeRead])
-async def read_all_episodes(
+@router.get("/", response_model=list[PodcastRead])
+async def read_all_podcasts(
+    session: AsyncSession = Depends(db_helper.get_session),
+) -> List[PodcastRead]:
+    podcasts = await get_all_podcasts_db(session=session)
+    return podcasts
+
+
+@router.get("/{podcast_id}", response_model=PodcastRead)
+async def read_podcast(
+    podcast_id: int = Path(gt=0),
     session: AsyncSession = Depends(db_helper.get_session),
 ):
-    episodes = await get_all_podcasts_db(session=session)
-    return episodes or []
+    podcast = await get_podcast(podcast_id, session)
+    if not podcast:
+        raise HTTPException(status_code=404, detail="Podcast not found")
+    return podcast
 
 
-@router.get("/{episode_id}", response_model=PodcastEpisodeRead)
-async def read_episode(
-    episode_id: int = Path(gt=0),
+@router.post("/", response_model=PodcastRead, status_code=status.HTTP_201_CREATED)
+async def create_podcast(
+    podcast: PodcastCreate,
     session: AsyncSession = Depends(db_helper.get_session),
 ):
-    episode = await get_podcast(episode_id, session)
-    if not episode:
-        raise HTTPException(status_code=404, detail="Episode not found")
-    return episode
+    try:
+        created_podcast = await create_podcast_db(podcast=podcast, session=session)
+        return created_podcast
+    except Exception as e:
+        raise HTTPException(status_code=400, detail=f"Failed to create podcast {e}")
 
 
-@router.post("/", response_model=PodcastEpisodeRead)
-async def create_episode(
-    episode: PodcastEpisodeCreate,
+@router.put("/{podcast_id}", response_model=PodcastRead)
+async def update_podcast(
+    podcast: PodcastUpdate,
+    podcast_id: int = Path(gt=0),
     session: AsyncSession = Depends(db_helper.get_session),
 ):
-    created_episode = await create_podcast_db(episode=episode, session=session)
-    return created_episode
-
-
-@router.put("/{episode_id}", response_model=PodcastEpisodeRead)
-async def update_episode(
-    episode: PodcastEpisodeUpdate,
-    episode_id: int = Path(gt=0),
-    session: AsyncSession = Depends(db_helper.get_session),
-):
-    updated_episode = await update_podcast_db(
-        episode_id=episode_id,
-        episode=episode,
+    updated_podcast = await update_podcast_db(
+        podcast_id=podcast_id,
+        podcast=podcast,
         session=session,
     )
-    if not updated_episode:
-        raise HTTPException(status_code=400, detail="Item not updated")
-    return updated_episode
+    if not updated_podcast:
+        raise HTTPException(status_code=404, detail="Podcast not found")
+    return updated_podcast
 
 
-@router.delete("/{episode_id}")
-async def delete_item(
-    episode_id: int = Path(gt=0),
+@router.delete("/{podcast_id}")
+async def delete_podcast(
+    podcast_id: int = Path(gt=0),
     session: AsyncSession = Depends(db_helper.get_session),
 ):
-    await delete_podcast_db(episode_id=episode_id, session=session)
+    deleted_podcast = await delete_podcast_db(podcast_id=podcast_id, session=session)
+    if not deleted_podcast:
+        raise HTTPException(status_code=404, detail="Podcast not found")
     return Response(status_code=status.HTTP_204_NO_CONTENT)
