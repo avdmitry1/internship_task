@@ -21,9 +21,9 @@ class DataBaseConfig(BaseModel):
     pool_size: int = 5
 
 
-class LLMSettings(BaseModel):
-    base_url: str = "BASE_URL_LLM"
-    model: str = "LLM_MODEL"
+class LLMSettings(BaseSettings):
+    base_url: str
+    model: str
     temperature: float = 0.5
 
 
@@ -37,7 +37,7 @@ class Settings(BaseSettings):
     run: RunConfig = RunConfig()
     api: ApiPrefix = ApiPrefix()
     db: DataBaseConfig
-    llm: LLMSettings = LLMSettings()
+    llm: LLMSettings
 
 
 settings = Settings()

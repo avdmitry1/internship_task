@@ -5,7 +5,7 @@ from langchain.prompts import PromptTemplate
 from langchain.schema.output_parser import StrOutputParser
 
 from core.config import settings
-from core.schemas.llm import GenAltRequest
+from core.schemas.llmSchema import Episode, GenAltRequest
 
 
 class LLMService:
@@ -25,9 +25,6 @@ class LLMService:
             Original podcast information:
             - Title: {original_title}
             - Description: {description}
-            - Host: {host}
-
-            Task: {user_prompt}
 
             Create a new title that is:
             - Engaging and catchy
@@ -43,10 +40,7 @@ class LLMService:
             Original podcast information:
             - Title: {title}
             - Description: {original_description}
-            - Host: {host}
-
-            Task: {user_prompt}
-
+            
             Create a new description that is:
             - Clear and informative
             - Engaging for the target audience
@@ -61,10 +55,7 @@ class LLMService:
             input_variables=[
                 "title",
                 "description",
-                "host",
                 "user_prompt",
-                "original_title",
-                "original_description",
             ],
         )
         return prompt_template
@@ -74,32 +65,51 @@ class LLMService:
         podcast: GenAltRequest,
         target: str,
         user_prompt: str,
+        episode_data: Episode,
     ) -> str:
         try:
             prompt_template = self.create_prompt_template(target)
-            prompt_data = {
-                "title": podcast.title,
-                "description": podcast.description,
-                "host": podcast.host,
-                "user_prompt": user_prompt,
-                "original_title": podcast.title,
-                "original_description": podcast.description,
-            }
+            prompt_data = {}
+
+            # Prepare prompt data based on target type
+            if target == "title":
+                prompt_data = {
+                    "original_title": episode_data.title,
+                    "description": episode_data.description,
+                    "user_prompt": user_prompt,
+                }
+            elif target == "description":
+                prompt_data = {
+                    "title": episode_data.title,
+                    "original_description": episode_data.description,
+                    "user_prompt": user_prompt,
+                }
+            else:
+                raise HTTPException(
+                    status_code=400,
+                    detail="Invalid target. Use 'title' or 'description'.",
+                )
+
+            # Execute prompt generation using the template and LLM
             chain = prompt_template | self.llm | self.output_parser
             result = await asyncio.to_thread(chain.invoke, prompt_data)
 
+            # Return the stripped result
             return result.strip().strip("'").strip('"')
+
         except Exception as e:
             raise HTTPException(
                 status_code=400, detail=f"LLM generation failed: {str(e)}"
             )
 
     async def connect_check(self) -> bool:
+        print("Checking LLM connection...")
         try:
-            test_prompt = "Say 'OK' if you can hear me."
+            test_prompt = "Can you generate a podcast title or description?"
             result = await asyncio.to_thread(self.llm.invoke, test_prompt)
-            return "OK" in result or "ok" in result.lower()
-        except Exception:
+            return result
+        except Exception as e:
+            print(f"LLM connect check failed: {e}")
             return False
 
 

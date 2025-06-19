@@ -1,5 +1,6 @@
-__all__ = ("db_helper", "Base", "Podcast")
+__all__ = ("db_helper", "Base", "Podcast", "Episode")
 
 from .db_helper import db_helper
-from .model_base import Base
-from .model_podcast import Podcast
+from .base import Base
+from .podcast import Podcast
+from .episode import Episode
