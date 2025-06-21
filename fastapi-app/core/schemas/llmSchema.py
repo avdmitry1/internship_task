@@ -22,5 +22,5 @@ class GenAltResponse(BaseModel):
     prompt: str
     alternative: str
 
-    class Config:
-        validate_by_name = True
+    # for more validation
+    model_config = {"validate_by_name": True}

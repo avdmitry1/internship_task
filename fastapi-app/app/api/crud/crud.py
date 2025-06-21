@@ -1,7 +1,7 @@
 from sqlalchemy.ext.asyncio import AsyncSession
 from core.models.podcast import Podcast
 from sqlalchemy import select
-from core.schemas.podcast import (
+from core.schemas.podcastSchema import (
     PodcastCreate,
     PodcastUpdate,
 )

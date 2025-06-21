@@ -12,41 +12,42 @@ router = APIRouter(prefix="/episodes", tags=["Episodes"])
 
 @router.post("/{episode_id}/generate_alternative")
 async def generate_alternative(
-    episode_id: int = Path(...),
-    data: GenAltRequest = Body(...),
+    episode_id: int = Path(..., gt=0, description="ID of the episode"),
+    data: GenAltRequest = Body(..., description="Request data for target and prompt"),
     session: AsyncSession = Depends(db_helper.get_session),
 ):
+    # get episode from db
     episode = await get_episode_by_id(session, episode_id)
     if not episode:
         raise HTTPException(status_code=404, detail="Episode not found")
 
-    # Преобразуем episode в Pydantic-модель (если нужно)
+    # transform episode to Pydantic episode model
     episode_data = Episode.model_validate(episode)
-
-    req = GenAltRequest(
-        target=data.target,
-        prompt=data.prompt,
-    )
 
     try:
         result = await llm_services.generate_alternatives(
-            podcast=req,
+            episode_data=episode_data,
             target=data.target,
             user_prompt=data.prompt,
-            episode_data=episode_data,
         )
+        return {
+            "original_episode": {
+                "id": episode_id,
+                "title": episode_data.title,
+                "description": episode_data.description,
+                "host": episode_data.host,
+            },
+            "request": {  # Group request data
+                "target": data.target,
+                "prompt": data.prompt,
+            },
+            "generated_alternative": result,
+            "success": True,
+        }
     except HTTPException as e:
         raise e
     except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Internal error: {e}")
-
-    return {
-        "original_episode": {
-            "title": episode_data.title,
-            "description": episode_data.description,
-            "host": episode_data.host,
-        },
-        "target": data.target,
-        "prompt": data.prompt,
-        "generated_alternative": result,
-    }
+        raise HTTPException(
+            status_code=500,
+            detail=f"Error generating alternative: {e}",
+        )

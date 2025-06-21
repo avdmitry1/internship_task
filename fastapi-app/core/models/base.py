@@ -2,7 +2,7 @@ from sqlalchemy import Integer
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column, declared_attr
 import inflect
 
-
+# https://pypi.org/project/inflect/
 inflect_engine = inflect.engine()
 
 

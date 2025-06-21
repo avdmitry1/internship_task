@@ -7,7 +7,7 @@ from app.api.crud.crud import (
     get_podcast,
     update_podcast_db,
 )
-from core.schemas.podcast import (
+from core.schemas.podcastSchema import (
     PodcastRead,
     PodcastCreate,
     PodcastUpdate,
@@ -30,7 +30,7 @@ async def read_all_podcasts(
 async def read_podcast(
     podcast_id: int = Path(gt=0),
     session: AsyncSession = Depends(db_helper.get_session),
-):
+) -> PodcastRead:
     podcast = await get_podcast(podcast_id, session)
     if not podcast:
         raise HTTPException(status_code=404, detail="Podcast not found")
@@ -41,7 +41,7 @@ async def read_podcast(
 async def create_podcast(
     podcast: PodcastCreate,
     session: AsyncSession = Depends(db_helper.get_session),
-):
+) -> PodcastRead:
     try:
         created_podcast = await create_podcast_db(podcast=podcast, session=session)
         return created_podcast
@@ -54,7 +54,7 @@ async def update_podcast(
     podcast: PodcastUpdate,
     podcast_id: int = Path(gt=0),
     session: AsyncSession = Depends(db_helper.get_session),
-):
+) -> PodcastRead:
     updated_podcast = await update_podcast_db(
         podcast_id=podcast_id,
         podcast=podcast,
@@ -69,7 +69,7 @@ async def update_podcast(
 async def delete_podcast(
     podcast_id: int = Path(gt=0),
     session: AsyncSession = Depends(db_helper.get_session),
-):
+) -> Response:
     deleted_podcast = await delete_podcast_db(podcast_id=podcast_id, session=session)
     if not deleted_podcast:
         raise HTTPException(status_code=404, detail="Podcast not found")

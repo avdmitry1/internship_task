@@ -3,10 +3,7 @@ from core.config import settings
 
 
 class DataBaseHelper:
-    """
-    Помічник для роботи з асинхронною базою даних через SQLAlchemy.
-    """
-
+    # Constructor
     def __init__(
         self,
         url: str,
@@ -31,18 +28,10 @@ class DataBaseHelper:
 
     # Method to close the engine
     async def dispose(self):
-        """
-        Закриває всі з'єднання з базою даних та звільняє ресурси.
-        Цей метод слід викликати при завершенні роботи програми
-        для коректного закриття всіх підключень до бази даних.
-        """
         await self.engine.dispose()
 
     # Method to get a session
     async def get_session(self):
-        """
-        Повертає сесію для роботи з базою даних.
-        """
         async with self.session_factory() as session:
             yield session
 

@@ -25,14 +25,17 @@ class LLMService:
             Original podcast information:
             - Title: {original_title}
             - Description: {description}
+            
+            User requirements: {user_prompt}
 
             Create a new title that is:
             - Engaging and catchy
             - Relevant to the content
             - Appropriate for the requested style/audience
-            - Short and concise (less than 20 words)
+            - Short and concise (less than 10 words)
             - Clear and informative
             """
+            input_variables = ["original_title", "description", "user_prompt"]
         else:  # description
             template = """
             You are a content writer specializing in podcast descriptions.
@@ -41,28 +44,24 @@ class LLMService:
             - Title: {title}
             - Description: {original_description}
             
+            User requirements: {user_prompt}
+            
             Create a new description that is:
             - Clear and informative
             - Engaging for the target audience
             - Relevant to the podcast content
             - Appropriate for the requested style/audience
-            - Short and concise (less than 50 words)
-            - Clear and informative
+            - Short and concise (less than 25 words)
             """
-
+            input_variables = ["title", "original_description", "user_prompt"]
         prompt_template = PromptTemplate(
             template=template,
-            input_variables=[
-                "title",
-                "description",
-                "user_prompt",
-            ],
+            input_variables=input_variables,
         )
         return prompt_template
 
     async def generate_alternatives(
         self,
-        podcast: GenAltRequest,
         target: str,
         user_prompt: str,
         episode_data: Episode,

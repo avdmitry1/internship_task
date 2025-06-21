@@ -20,5 +20,5 @@ class PodcastUpdate(BaseModel):
 
 class PodcastRead(Podcast):
     id: int
-
+    # can make pydantic model from attributes also not only dict
     model_config = {"from_attributes": True}
