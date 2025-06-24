@@ -44,8 +44,6 @@ async def generate_alternative(
             "generated_alternative": result,
             "success": True,
         }
-    except HTTPException as e:
-        raise e
     except Exception as e:
         raise HTTPException(
             status_code=500,
