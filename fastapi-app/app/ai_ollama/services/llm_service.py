@@ -5,7 +5,7 @@ from langchain.prompts import PromptTemplate
 from langchain.schema.output_parser import StrOutputParser
 
 from core.config import settings
-from core.schemas.llmSchema import Episode, GenAltRequest
+from core.schemas.llmSchema import Episode
 
 
 class LLMService:
